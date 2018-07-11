@@ -1,8 +1,8 @@
 var turnFactory = function(o){
     o = o || {};
     o.callback = o.callback || function(){ console.log("No callback provided!");};
-    o.xSize = o.xSize || 16;
-    o.ySize = o.ySize || 16;
+    o.xSize = o.xSize || 0;
+    o.ySize = o.ySize || 0;
     o.cell = o.cell || {};
     
     o.cell.live = false;
@@ -16,6 +16,44 @@ var turnFactory = function(o){
             b: 0
         };
     }
+    
+    function colorOptions () {
+        return {
+            red: {
+                r: 255,
+                g: 0,
+                b: 0 
+            },
+            yellow: {
+                r: 255,
+                g: 255,
+                b: 0 
+            },
+            blue: {
+                r: 0,
+                g: 0,
+                b: 255 
+            },
+            cyan: {
+                r: 0,
+                g: 255,
+                b: 255
+            },
+            purple: {
+                r: 255,
+                g: 0,
+                b: 255 
+            },
+            green: {
+                r: 0,
+                g: 255,
+                b: 0 
+            }
+        };
+        
+    };
+    
+    
     
     function boardFactory(o){
         o = o || {};
@@ -79,7 +117,9 @@ var turnFactory = function(o){
             board: b,
             userID: 0,
             userColor: colorFactory(),
-            boardColor: colorFactory()
+            boardColor: colorFactory(), //153, 153, 153
+            deadColor: colorFactory(),   //126, 126, 126
+            colorOptions: colorOptions()
         };
     };
     
@@ -91,3 +131,20 @@ var turnFactory = function(o){
     
 };
 
+function getTurn(o){
+    o = o || {
+        xSize: 16,
+        ySize: 16,
+        cell: {
+           color: {
+                 r:25,
+                 g: 25,
+                 b: 25
+           }
+       }
+    };
+    
+    var tf = turnFactory(o);
+    var t = tf.get();
+    return t;    
+}
