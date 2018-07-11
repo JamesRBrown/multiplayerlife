@@ -13,8 +13,29 @@
 
 	<center> 
 		<h1>Conway's Game of Life! </h1> 
+                <div>
+                    <span>Generation: </span><span class='generation'>0</span>
+                </div>
 
-		<canvas id="canvas" width="400px" height="400px" style="border: 1px solid black";></canvas>
+		<canvas class='board' id="canvas" width="400px" height="400px" style="border: 1px solid black";></canvas>
+                <div>
+                    <button class='reset'>reset</button>
+                    <button class='play pause'>play</button>
+                    <select class='color'>
+                        <option>red</option>
+                        <option>yellow</option>
+                        <option>blue</option>
+                        <option>cyan</option>
+                        <option>purple</option>
+                        <option>green</option>
+                    </select>
+                    <select class='size'>
+                        <option>16x16</option>
+                        <option>32x32</option>
+                        <option>64x64</option>
+                        <option>128x128</option>
+                    </select>
+                </div>
 	</center> 
 </body>
 

@@ -1,15 +1,43 @@
 display = (function(){
-    var obj;
     var model;
     var canvas; 
-    canvas = document.getElementById("canvas");
-    canvas.addEventListener('click', function(evt) 
-    {
-            var mousePos = getSquare(canvas, evt);
-    });
-    //console.log(obj); 
     
-
+    (function(){
+        setupControllers();
+    })();
+    
+    function setupControllers(){
+        
+        canvas = document.getElementById("canvas");
+        canvas.addEventListener('click', function(evt) 
+        {
+                var mousePos = getSquare(canvas, evt);
+        });
+        //console.log(obj); 
+        
+        $('.reset').on('click', function(){
+            client.size($('.size').val());
+        });
+        $('.play').on('click', function(){
+            if($(this).text() === "play"){
+                client.play();
+            }else{
+                client.pause();
+            }
+        });
+        
+        $('.size').on('change', function(){
+            console.log("board size change");
+            console.log($('.size').val());
+            client.size($('.size').val());
+        });
+    }
+    
+    function setPlay(state){
+        $('.play').text(state);
+    }
+    
+    
     //Break the paint out of this function, then just repaint board each time something is clicked
     function paintBoard(o)
     {
@@ -27,6 +55,10 @@ display = (function(){
             var xSize = o.board.length;
             var ySize = o.board[0].length;
             var numPixels = 25;
+            
+            updateSize(xSize +"x"+ ySize);
+            $('.board').attr('width', numPixels * xSize);
+            $('.board').attr('height', numPixels * ySize);
             //ctx.fillStyle = 'rgb(' + obj.deadColor.r + ', ' + obj.deadColor.g + ', ' + obj.deadColor.b + ')';
 
             for (x=0;x<xSize;x++) //replaced w with boardSize
@@ -45,6 +77,8 @@ display = (function(){
                             //ctx.stroke();
                     }
             }	
+            
+            $('.generation').text(o.generation);
     }
 
 
@@ -62,14 +96,18 @@ display = (function(){
             x = Math.floor(x);
             y = Math.floor(y);
             
+            var userColor = model.colorOptions[$(".color").val()];
+            
+            
+            
             //2. isCellAlive(): if true, set to dead and dead color; else set to alive and user color
             model.board[x][y].updated = true; //Server needs to know if cell was updated in any way
             if(model.board[x][y].alive === false)
             {
                     model.board[x][y].alive = true;
-                    model.board[x][y].color.r = model.userColor.r; 
-                    model.board[x][y].color.g = model.userColor.g; 
-                    model.board[x][y].color.b = model.userColor.b;
+                    model.board[x][y].color.r = userColor.r; 
+                    model.board[x][y].color.g = userColor.g; 
+                    model.board[x][y].color.b = userColor.b;
             }
             else
             {
@@ -79,11 +117,7 @@ display = (function(){
                     model.board[x][y].color.b = model.deadColor.b;
             }
             
-            //3. Repaint board
-            paintBoard(model); 
-            //sendData();
-            
-            //4. Notify Server
+            //3. Notify Server
             var update = {
                 coordinate: {x:x, y:y},
                 color: {
@@ -106,9 +140,20 @@ display = (function(){
         
         return model;
     }
+    function updateGeneration(update){
+        model.generation = update;
+        $('.generation').text(model.generation);
+    }
+    
+    function updateSize(size){
+        $(".size").val(size);
+    }
 
     return {
         paintBoard: paintBoard,
-        updateModel: updateModel
+        updateModel: updateModel,
+        updateGeneration: updateGeneration,
+        setPlay: setPlay,
+        updateSize: updateSize
     };
 })();

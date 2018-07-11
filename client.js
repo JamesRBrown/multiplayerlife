@@ -24,10 +24,15 @@ client = (function(){
         
         return ws;
     }
+    function reconnect(){
+        ws = connect();
+    }
     
     (function(){
-        ws = connect();
+        reconnect();
     })();
+    
+    
     
     function rxMessagesProcessor(o){
         
@@ -41,30 +46,69 @@ client = (function(){
             });
             display.paintBoard(model);
         }
+        if(o.message === "play"){
+            display.setPlay("pause");
+        }
+        if(o.message === "pause"){
+            display.setPlay("play");
+        }
+        if(o.message === "interval"){
+            
+        }
+        if(o.message === "generation"){
+            display.updateGeneration(o.generation);
+        }
+        if(o.message === "size"){
+            display.updateSize(o.size);
+        }
             
     }
     
     var send = {
+        send: function(data){
+            if(ws.readyState === ws.CLOSED){
+                reconnect();  
+            }else{
+                ws.send(data);
+            }
+        },
         update: function(update){
-            ws.send(JSON.stringify({
+            send.send(JSON.stringify({
                 message: "update",
                 update: update
             }));
         },
         modelRequest: function(){
-            ws.send(JSON.stringify({
+            send.send(JSON.stringify({
                 message: "model"
+            }));
+        },
+        play: function(){
+            send.send(JSON.stringify({
+                message: "play"
+            }));
+        },
+        pause: function(){
+            send.send(JSON.stringify({
+                message: "pause"
+            }));
+        },
+        size: function(size){
+            send.send(JSON.stringify({
+                message: "size",
+                size: size
             }));
         }
     };
     
     return {
-        reconnect: function(){
-            ws = connect();
-        },
+        reconnect: reconnect,
         getResponse: function(){
             return responses;
         },
-        updateServer: send.update
+        updateServer: send.update,
+        play: send.play,
+        pause: send.pause,
+        size: send.size
     };
 })();
