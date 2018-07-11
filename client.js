@@ -1,4 +1,4 @@
-(function(){
+client = (function(){
     
     var ws = {};
     var responses = [];
@@ -9,6 +9,7 @@
         ws.onopen = function () {
             console.log('websocket is connected ...');
             ws.send(JSON.stringify({message: "connected"}));
+            send.modelRequest();
         };
 
         responses = [];
@@ -28,10 +29,34 @@
         ws = connect();
     })();
     
-    function rxMessagesProcessor(message){
+    function rxMessagesProcessor(o){
         
-        
+        if(o.message === "model"){
+            display.paintBoard(o.model)
+        }
+        if(o.message === "updates"){
+            var model;
+            o.updates.forEach(function(update){
+                model = display.updateModel(update);
+            });
+            display.paintBoard(model);
+        }
+            
     }
+    
+    var send = {
+        update: function(update){
+            ws.send(JSON.stringify({
+                message: "update",
+                update: update
+            }));
+        },
+        modelRequest: function(){
+            ws.send(JSON.stringify({
+                message: "model"
+            }));
+        }
+    };
     
     return {
         reconnect: function(){
@@ -39,6 +64,7 @@
         },
         getResponse: function(){
             return responses;
-        }
+        },
+        updateServer: send.update
     };
 })();
