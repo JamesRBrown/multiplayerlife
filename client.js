@@ -61,6 +61,9 @@ client = (function(){
         if(o.message === "size"){
             display.updateSize(o.size);
         }
+        if(o.message === "interval"){
+            display.updateInterval(o.interval);
+        }
             
     }
     
@@ -98,6 +101,17 @@ client = (function(){
                 message: "size",
                 size: size
             }));
+        },
+        interval: function(interval){
+            send.send(JSON.stringify({
+                message: "interval",
+                interval: interval
+            }));
+        },
+        next: function(interval){
+            send.send(JSON.stringify({
+                message: "nextTick"
+            }));
         }
     };
     
@@ -109,6 +123,8 @@ client = (function(){
         updateServer: send.update,
         play: send.play,
         pause: send.pause,
-        size: send.size
+        size: send.size,
+        interval: send.interval,
+        next: send.next
     };
 })();

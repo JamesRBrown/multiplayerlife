@@ -15,6 +15,9 @@ display = (function(){
         });
         //console.log(obj); 
         
+        $('.next').on('click', function(){
+            client.next($('.next').text());
+        });
         $('.reset').on('click', function(){
             client.size($('.size').val());
         });
@@ -27,9 +30,12 @@ display = (function(){
         });
         
         $('.size').on('change', function(){
-            console.log("board size change");
-            console.log($('.size').val());
             client.size($('.size').val());
+        });
+        
+        $('.interval').on('change', function(){
+            console.log($('.interval').val());
+            client.interval($('.interval').val());
         });
     }
     
@@ -148,12 +154,16 @@ display = (function(){
     function updateSize(size){
         $(".size").val(size);
     }
+    function updateInterval(interval){
+        $(".interval").val(interval);
+    }
 
     return {
         paintBoard: paintBoard,
         updateModel: updateModel,
         updateGeneration: updateGeneration,
         setPlay: setPlay,
-        updateSize: updateSize
+        updateSize: updateSize,
+        updateInterval: updateInterval
     };
 })();
