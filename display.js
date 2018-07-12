@@ -18,7 +18,7 @@ display = (function(){
         $('.next').on('click', function(){
             client.next($('.next').text());
         });
-        $('.reset').on('click', function(){
+        $('.reset').on('click', function(){ 
             client.size($('.size').val());
         });
         $('.play').on('click', function(){

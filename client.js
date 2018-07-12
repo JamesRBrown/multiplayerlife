@@ -74,7 +74,7 @@ client = (function(){
             }else{
                 ws.send(data);
             }
-        },
+        }, 
         update: function(update){
             send.send(JSON.stringify({
                 message: "update",
