@@ -40,11 +40,13 @@ client = (function(){
             display.paintBoard(o.model)
         }
         if(o.message === "updates"){
+            display.updateBoard(o.updates);
+            /*
             var model;
             o.updates.forEach(function(update){
-                model = display.updateModel(update);
+                model = display.updateModel(update);                
             });
-            display.paintBoard(model);
+            display.paintBoard(model);//*/
         }
         if(o.message === "play"){
             display.setPlay("pause");

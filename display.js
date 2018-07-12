@@ -1,6 +1,8 @@
 display = (function(){
     var model;
     var canvas; 
+    var numPixels = 25;
+    var padding = 1;
     
     (function(){
         setupControllers();
@@ -60,7 +62,6 @@ display = (function(){
 
             var xSize = o.board.length;
             var ySize = o.board[0].length;
-            var numPixels = 25;
             
             updateSize(xSize +"x"+ ySize);
             $('.board').attr('width', numPixels * xSize);
@@ -74,7 +75,7 @@ display = (function(){
 
                             ctx.fillStyle = 'rgb(' + o.board[x][y].color.r + ', ' + o.board[x][y].color.g + 
                             ', ' + o.board[x][y].color.b + ')';
-                            ctx.fillRect(x * numPixels, y * numPixels, 24, 24);
+                            ctx.fillRect(x * numPixels, y * numPixels, numPixels - padding, numPixels - padding);
                             //ctx.moveTo(x, 0);
                             //ctx.lineTo(x, h);
                             //ctx.stroke();
@@ -85,6 +86,21 @@ display = (function(){
             }	
             
             $('.generation').text(o.generation);
+    }
+    
+    function updateBoard(updates){
+            var o = model;
+            
+            var ctx = canvas.getContext('2d');
+            
+            updates.forEach(function(update){
+                var x = update.coordinate.x;
+                var y = update.coordinate.y;
+
+                ctx.fillStyle = 'rgb(' + update.color.r + ', ' + update.color.g + ', ' + update.color.b + ')';
+                ctx.fillRect(x * numPixels, y * numPixels, numPixels - padding, numPixels - padding);
+                
+            });
     }
 
 
@@ -160,6 +176,7 @@ display = (function(){
 
     return {
         paintBoard: paintBoard,
+        updateBoard: updateBoard,
         updateModel: updateModel,
         updateGeneration: updateGeneration,
         setPlay: setPlay,
