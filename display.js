@@ -3,6 +3,25 @@ display = (function(){
     var canvas; 
     var numPixels = 25;
     var padding = 1;
+    var cells = [];
+    
+    function hashCoordinates(coordinate){
+        return coordinate.x+ "," + coordinate.y;
+    }
+    
+    function getCell(coordinate){
+        
+        if(!cells[hashCoordinates(coordinate)]){
+            cells[hashCoordinates(coordinate)] = {
+                        coordinate: coordinate,
+                        color: {r:model.defaultColor, g:model.defaultColor, b:model.defaultColor},
+                        alive: false
+                    };
+        }
+        
+        return cells[hashCoordinates(coordinate)];
+    }
+    
     
     (function(){
         setupControllers();
@@ -60,21 +79,21 @@ display = (function(){
             //var w = 400; 
             //var h = 400;
 
-            var xSize = o.board.length;
-            var ySize = o.board[0].length;
+            var xSize = o.boardSize.x;
+            var ySize = o.boardSize.y;
             
             updateSize(xSize +"x"+ ySize);
             $('.board').attr('width', numPixels * xSize);
             $('.board').attr('height', numPixels * ySize);
             //ctx.fillStyle = 'rgb(' + obj.deadColor.r + ', ' + obj.deadColor.g + ', ' + obj.deadColor.b + ')';
 
-            for (x=0;x<xSize;x++) //replaced w with boardSize
+            for (var x=0;x<xSize;x++) //replaced w with boardSize
             {
-                    for (y=0;y<ySize;y++) //replaced h with boardSize
+                    for (var y=0;y<ySize;y++) //replaced h with boardSize
                     {
 
-                            ctx.fillStyle = 'rgb(' + o.board[x][y].color.r + ', ' + o.board[x][y].color.g + 
-                            ', ' + o.board[x][y].color.b + ')';
+                            ctx.fillStyle = 'rgb(' + o.defaultColor.r + ', ' + o.defaultColor.g + 
+                            ', ' + o.defaultColor.b + ')';
                             ctx.fillRect(x * numPixels, y * numPixels, numPixels - padding, numPixels - padding);
                             //ctx.moveTo(x, 0);
                             //ctx.lineTo(x, h);
@@ -86,6 +105,10 @@ display = (function(){
             }	
             
             $('.generation').text(o.generation);
+            
+            if(o.living && o.living.length){
+                updateBoard(o.living);
+            }
     }
     
     function updateBoard(updates){
@@ -96,7 +119,9 @@ display = (function(){
             updates.forEach(function(update){
                 var x = update.coordinate.x;
                 var y = update.coordinate.y;
-
+                
+                cells[hashCoordinates(update.coordinate)] = update;
+                
                 ctx.fillStyle = 'rgb(' + update.color.r + ', ' + update.color.g + ', ' + update.color.b + ')';
                 ctx.fillRect(x * numPixels, y * numPixels, numPixels - padding, numPixels - padding);
                 
@@ -120,48 +145,28 @@ display = (function(){
             
             var userColor = model.colorOptions[$(".color").val()];
             
-            
+            var cell = getCell({x:x, y:y});
             
             //2. isCellAlive(): if true, set to dead and dead color; else set to alive and user color
-            model.board[x][y].updated = true; //Server needs to know if cell was updated in any way
-            if(model.board[x][y].alive === false)
+            if(cell.alive === false)
             {
-                    model.board[x][y].alive = true;
-                    model.board[x][y].color.r = userColor.r; 
-                    model.board[x][y].color.g = userColor.g; 
-                    model.board[x][y].color.b = userColor.b;
+                    cell.alive = true;
+                    cell.color.r = userColor.r; 
+                    cell.color.g = userColor.g; 
+                    cell.color.b = userColor.b;
             }
             else
             {
-                    model.board[x][y].alive = false;
-                    model.board[x][y].color.r = model.deadColor.r; 
-                    model.board[x][y].color.g = model.deadColor.g; 
-                    model.board[x][y].color.b = model.deadColor.b;
+                    cell.alive = false;
+                    cell.color.r = model.deadColor.r; 
+                    cell.color.g = model.deadColor.g; 
+                    cell.color.b = model.deadColor.b;
             }
             
             //3. Notify Server
-            var update = {
-                coordinate: {x:x, y:y},
-                color: {
-                    r:model.board[x][y].color.r, 
-                    g:model.board[x][y].color.g, 
-                    b:model.board[x][y].color.b
-                },
-                alive:  model.board[x][y].alive
-            };
-            client.updateServer(update);
+            client.updateServer(cell);
     }
     
-    function updateModel(update){
-        model.board[update.coordinate.x][update.coordinate.y].alive = update.alive;
-        model.board[update.coordinate.x][update.coordinate.y].color = {
-            r: update.color.r,
-            g: update.color.g,
-            b: update.color.b
-        };
-        
-        return model;
-    }
     function updateGeneration(update){
         model.generation = update;
         $('.generation').text(model.generation);
@@ -177,7 +182,6 @@ display = (function(){
     return {
         paintBoard: paintBoard,
         updateBoard: updateBoard,
-        updateModel: updateModel,
         updateGeneration: updateGeneration,
         setPlay: setPlay,
         updateSize: updateSize,
